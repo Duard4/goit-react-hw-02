@@ -20,4 +20,7 @@
     .bad {
         --color: #d96d3f;
     }
+    .reset {
+        --color: #7ed2da;
+    }
 }
