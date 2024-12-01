@@ -1,23 +1,37 @@
+import { useEffect, useState } from "react";
 import "./App.css";
-import userData from "../data/userData.json";
-import friends from "../data/friends.json";
-import transactions from "../data/transactions.json";
-import Profile from "./Profile/Profile";
-import FriendList from "./FriendList/FriendList";
-import TransactionHistory from "./TransactionHistory/TransactionHistory";
+import Description from "./Description/Description";
+import Feedback from "./Feedback/Feedback";
+import Options from "./Options/Options";
 
 export default function App() {
+    const [reviews, setReviews] = useState(() => {
+        const savedReviews = window.localStorage.getItem("reviews");
+        if (savedReviews) return JSON.parse(savedReviews);
+
+        return {
+            good: 0,
+            neutral: 0,
+            bad: 0,
+        };
+    });
+
+    const updateFeedback = (feedbackType) => {
+        setReviews({
+            ...reviews,
+            [feedbackType]: reviews[feedbackType] + 1,
+        });
+    };
+
+    useEffect(() => {
+        window.localStorage.setItem("reviews", JSON.stringify(reviews));
+    }, [reviews]);
+
     return (
         <>
-            <Profile
-                name={userData.username}
-                tag={userData.tag}
-                location={userData.location}
-                image={userData.avatar}
-                stats={userData.stats}
-            />
-            <FriendList friends={friends} />
-            <TransactionHistory items={transactions} />
+            <Description></Description>
+            <Options onFeedback={updateFeedback}></Options>
+            <Feedback reviews={reviews}></Feedback>
         </>
     );
 }
