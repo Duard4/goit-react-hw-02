@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import Description from "./Description/Description";
 import Feedback from "./Feedback/Feedback";
 import Options from "./Options/Options";
+import Notification from "./Notification/Notification";
 
 export default function App() {
     const [reviews, setReviews] = useState(() => {
@@ -24,15 +25,18 @@ export default function App() {
                 ...prevReviews,
                 [feedbackType]: prevReviews[feedbackType] + 1,
             };
-            window.localStorage.setItem(
-                "reviews",
-                JSON.stringify(updatedReviews)
-            );
             return updatedReviews;
         });
     };
 
+    useEffect(() => {
+        window.localStorage.setItem("reviews", JSON.stringify(reviews));
+    }, [reviews]);
+
     const isEmpty = reviews.good + reviews.neutral + reviews.bad === 0;
+    const partPos = Math.round(
+        (reviews.good / (reviews.good + reviews.neutral + reviews.bad)) * 100
+    );
 
     return (
         <>
@@ -42,7 +46,11 @@ export default function App() {
                 onReset={resetReviews}
                 resetBtn={!isEmpty}
             />
-            <Feedback reviews={reviews} />
+            {!isEmpty ? (
+                <Feedback reviews={reviews} partPos={partPos} />
+            ) : (
+                <Notification message="No feedback yet"></Notification>
+            )}
         </>
     );
 }
